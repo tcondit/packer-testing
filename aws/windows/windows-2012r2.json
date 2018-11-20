@@ -1,88 +1,89 @@
 {
-  "variables": {
-    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
-    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
-    "region":         "eu-west-2",
-
-    "clean_general": "true",
-    "optimise_win_volume": "true"
-  },
-  "builders": [
-    {
-      "type": "amazon-ebs",
-      "access_key": "{{ user `aws_access_key` }}",
-      "secret_key": "{{ user `aws_secret_key` }}",
-      "region": "{{ user `region` }}",
-      "instance_type": "t2.micro",
-      "source_ami_filter": {
-        "filters": {
-          "virtualization-type": "hvm",
-          "name": "*Windows_Server-2012-R2*English-64Bit-Base*",
-          "root-device-type": "ebs"
+    "builders": [
+        {
+            "access_key": "{{ user `aws_access_key` }}",
+            "ami_name": "windows2012r2-packer-demo-{{timestamp}}",
+            "communicator": "winrm",
+            "instance_type": "t2.micro",
+            "region": "{{ user `region` }}",
+            "secret_key": "{{ user `aws_secret_key` }}",
+            "source_ami_filter": {
+                "filters": {
+                    "name": "*Windows_Server-2012-R2*English-64Bit-Base*",
+                    "root-device-type": "ebs",
+                    "virtualization-type": "hvm"
+                },
+                "most_recent": true,
+                "owners": "amazon"
+            },
+            "type": "amazon-ebs",
+            "user_data_file": "./bootstrap/BootstrapWin.txt",
+            "winrm_password": "SuperS3cr3t!",
+            "winrm_username": "Administrator"
+        }
+    ],
+    "provisioners": [
+        {
+            "environment_vars": [
+                "DEVOPS_LIFE_IMPROVER=PACKER"
+            ],
+            "inline": [
+                "Write-Host \"HELLO NEW USER; WELCOME TO $Env:DEVOPS_LIFE_IMPROVER\"",
+                "Write-Host \"You need to use backtick escapes when using\"",
+                "Write-Host \"characters such as DOLLAR`$ directly in a command\"",
+                "Write-Host \"or in your own scripts.\""
+            ],
+            "type": "powershell"
         },
-        "most_recent": true,
-        "owners": "amazon"
-      },
-      "ami_name": "windows2012r2-packer-demo-{{timestamp}}",
-      "user_data_file": "./bootstrap/BootstrapWin.txt",
-      "communicator": "winrm",
-      "winrm_username": "Administrator",
-      "winrm_password": "SuperS3cr3t!"
+        {
+            "environment_vars": [
+                "VAR1=A$Dollar",
+                "VAR2=A`Backtick",
+                "VAR3=A'SingleQuote",
+                "VAR4=A\"DoubleQuote"
+            ],
+            "script": "./scripts/StandardScriptTest.ps1",
+            "type": "powershell"
+        },
+        {
+            "elevated_password": "SuperS3cr3t!",
+            "elevated_user": "Administrator",
+            "environment_vars": [
+                "FOO=bar"
+            ],
+            "scripts": [
+                "./scripts/DotNetOptimizationSpeedUp.ps1"
+            ],
+            "type": "powershell"
+        },
+        {
+            "elevated_password": "SuperS3cr3t!",
+            "elevated_user": "Administrator",
+            "environment_vars": [
+                "CLEAN_GENERAL={{user `clean_general`}}"
+            ],
+            "scripts": [
+                "./scripts/CleanGeneral.ps1"
+            ],
+            "type": "powershell"
+        },
+        {
+            "elevated_password": "SuperS3cr3t!",
+            "elevated_user": "Administrator",
+            "environment_vars": [
+                "OPTIMISE_WIN_VOLUME={{user `optimise_win_volume`}}"
+            ],
+            "scripts": [
+                "./scripts/OptimiseWindowsVolume.ps1"
+            ],
+            "type": "powershell"
+        }
+    ],
+    "variables": {
+        "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+        "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+        "clean_general": "true",
+        "optimise_win_volume": "true",
+        "region": "eu-west-2"
     }
-  ],
-  "provisioners": [
-    {
-      "type": "powershell",
-      "environment_vars": ["DEVOPS_LIFE_IMPROVER=PACKER"],
-      "inline": [
-        "Write-Host \"HELLO NEW USER; WELCOME TO $Env:DEVOPS_LIFE_IMPROVER\"",
-        "Write-Host \"You need to use backtick escapes when using\"",
-        "Write-Host \"characters such as DOLLAR`$ directly in a command\"",
-        "Write-Host \"or in your own scripts.\""
-      ]
-    },
-    {
-      "type": "powershell",
-      "environment_vars": [
-        "VAR1=A$Dollar",
-        "VAR2=A`Backtick",
-        "VAR3=A'SingleQuote",
-        "VAR4=A\"DoubleQuote"
-      ],
-      "script": "./scripts/StandardScriptTest.ps1"
-    },
-    {
-      "type": "powershell",
-      "elevated_user": "Administrator",
-      "elevated_password": "SuperS3cr3t!",
-      "environment_vars": [
-        "FOO=bar"
-      ],
-      "scripts": [
-        "./scripts/DotNetOptimizationSpeedUp.ps1"
-      ]
-    },
-    {
-      "type": "powershell",
-      "elevated_user": "Administrator",
-      "elevated_password": "SuperS3cr3t!",
-      "environment_vars": [
-        "CLEAN_GENERAL={{user `clean_general`}}"
-      ],
-      "scripts": [
-        "./scripts/CleanGeneral.ps1"
-      ]
-    },
-    {
-      "type": "powershell",
-      "elevated_user": "Administrator",
-      "elevated_password": "SuperS3cr3t!",
-      "environment_vars": [
-        "OPTIMISE_WIN_VOLUME={{user `optimise_win_volume`}}"
-      ],
-      "scripts": [
-        "./scripts/OptimiseWindowsVolume.ps1"
-      ]
-    }
-  ]
 }
