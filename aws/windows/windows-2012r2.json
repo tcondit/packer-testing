@@ -1,11 +1,80 @@
 {
+    "variables": {
+        "aws_access_key": "",
+        "aws_secret_key": "",
+        "clean_general": "true",
+        "instance_type": "",
+        "optimise_win_volume": "true",
+        "vpc_id": "",
+        "subnet_id": "",
+        "vpc_private_sg_id": "",
+        "vpc_private_sn_id": "",
+        "vpc_region": "",
+        "winrm_username": ""
+    },
     "builders": [
         {
             "access_key": "{{ user `aws_access_key` }}",
             "ami_name": "windows2012r2-packer-demo-{{timestamp}}",
             "communicator": "winrm",
-            "instance_type": "t2.micro",
-            "region": "{{ user `region` }}",
+            "instance_type": "{{ user `instance_type` }}",
+            "launch_block_device_mappings": [
+                {
+                    "delete_on_termination": "true",
+                    "device_name": "/dev/sda1",
+                    "volume_size": "50",
+                    "volume_type": "gp2"
+                },
+                {
+                    "delete_on_termination": "true",
+                    "device_name": "xvdb",
+                    "encrypted": "true",
+                    "snapshot_id": "snap-047a1b65379998e97",
+                    "volume_size": "8",
+                    "volume_type": "gp2"
+                },
+                {
+                    "delete_on_termination": "true",
+                    "device_name": "xvdc",
+                    "encrypted": "true",
+                    "snapshot_id": "snap-05fcfa3324c2ab7bc",
+                    "volume_size": "100",
+                    "volume_type": "gp2"
+                },
+                {
+                    "delete_on_termination": "true",
+                    "device_name": "xvdd",
+                    "encrypted": "true",
+                    "snapshot_id": "snap-072d38f11ffb7b529",
+                    "volume_size": "101",
+                    "volume_type": "gp2"
+                },
+                {
+                    "delete_on_termination": "true",
+                    "device_name": "xvde",
+                    "encrypted": "true",
+                    "snapshot_id": "snap-072d38f11ffb7b529",
+                    "volume_size": "102",
+                    "volume_type": "gp2"
+                },
+                {
+                    "delete_on_termination": "true",
+                    "device_name": "xvdf",
+                    "encrypted": "true",
+                    "snapshot_id": "snap-0107c59783b2f5182",
+                    "volume_size": "103",
+                    "volume_type": "gp2"
+                },
+                {
+                    "delete_on_termination": "true",
+                    "device_name": "xvdg",
+                    "encrypted": "true",
+                    "snapshot_id": "snap-081c5c33b7f6743aa",
+                    "volume_size": "10",
+                    "volume_type": "gp2"
+                }
+            ],
+            "region": "{{ user `vpc_region` }}",
             "secret_key": "{{ user `aws_secret_key` }}",
             "source_ami_filter": {
                 "filters": {
@@ -16,10 +85,12 @@
                 "most_recent": true,
                 "owners": "amazon"
             },
+            "subnet_id": "{{ user `vpc_private_sn_id` }}",
             "type": "amazon-ebs",
             "user_data_file": "./bootstrap/BootstrapWin.txt",
-            "winrm_password": "SuperS3cr3t!",
-            "winrm_username": "Administrator"
+            "vpc_id": "{{ user `vpc_id` }}",
+            "winrm_password": "{{ user `winrm_password` }}",
+            "winrm_username": "{{ user `winrm_username` }}"
         }
     ],
     "provisioners": [
@@ -78,12 +149,5 @@
             ],
             "type": "powershell"
         }
-    ],
-    "variables": {
-        "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
-        "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
-        "clean_general": "true",
-        "optimise_win_volume": "true",
-        "region": "eu-west-2"
-    }
+    ]
 }

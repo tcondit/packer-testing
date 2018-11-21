@@ -1,0 +1,13 @@
+{
+    "aws_access_key": "",
+    "aws_secret_key": "",
+    "clean_general": "true",
+    "instance_type": "t2.micro",
+    "optimise_win_volume": "true",
+    "vpc_id": "vpc-bba6cdc2",
+    "vpc_private_sg_id": "sg-0006ab28ef2ba15ac",
+    "vpc_private_sn_id": "subnet-76db5e2c",
+    "vpc_region": "us-west-2",
+    "winrm_password": "SecretPassword",
+    "winrm_username": "Administrator"
+}
